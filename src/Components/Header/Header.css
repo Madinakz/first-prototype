@@ -1,0 +1,15 @@
+
+.header{
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 18px;
+    
+}
+.languages{
+    display: flex;
+    gap: 25px;
+}
