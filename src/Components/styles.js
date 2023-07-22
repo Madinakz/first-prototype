@@ -97,6 +97,11 @@ export const StyledTextField = styled(TextField)`
   font-family: 'Monaco', monospace;
 `;
 
+export const StyledTextFieldForDetailedCalc = styled(TextField)`
+  font-family: 'Monaco', monospace;
+  margin-bottom: 0.5rem;
+`;
+
 // Styled FormControlLabel with Switch control
 export const StyledFormControlLabel = styled(FormControlLabel)`
   .MuiSwitch-colorPrimary.Mui-checked {
@@ -115,4 +120,5 @@ export const StyledTooltip = styled(Tooltip)`
     color: #fff; /* Replace with your desired text color */
     font-size: 14px; /* Replace with your desired font size */
   }
+  font-family: 'Monaco', monospace;
 `;

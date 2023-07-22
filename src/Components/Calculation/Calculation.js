@@ -1,4 +1,5 @@
 import React from 'react';
+import Results from '../Results/Results';
 
 // Styled Material UI elements
 import {
@@ -12,7 +13,8 @@ import {
   StyledMenuItem,
   StyledTextField,
   StyledFormControlLabel,
-  StyledTooltip
+  StyledTooltip,
+  StyledTextFieldForDetailedCalc
 } from '../styles'
 
 // Material UI elements
@@ -27,6 +29,7 @@ import {
   WorkTwoTone,
   CalendarMonthTwoTone,
   PaymentsTwoTone,
+  LocalAtmTwoTone
 } from '@mui/icons-material';
 
 // Material UI Calendar libraries
@@ -72,10 +75,84 @@ export default function Calculation() {
   };
 
   // setCheckedDetailedCalc - HANDLER
-  const [checked, setCheckedDetailedCalc] = React.useState(true);
+  const [checked, setCheckedDetailedCalc] = React.useState(false);
   const handleChangeDetailedCalc = (event) => {
     setCheckedDetailedCalc(event.target.checked);
   };
+
+  // array with the last 24 months for detailed calculation
+  const months = Array.from({ length: 24 }, (_, index) => {
+    const currentDate = selectedDate ? new Date(selectedDate) : new Date();
+    currentDate.setDate(1); // Set the date to 1st day of the month
+    currentDate.setMonth(currentDate.getMonth() - index - 1);
+
+    const month = currentDate.toLocaleString('default', { month: 'long' });
+    const year = currentDate.getFullYear();
+    return `${month} ${year}`;
+  }).slice(-24);
+
+  // sum of 12 & 24 months for detailed calculation
+  const [last24Sum, setLast24Sum] = React.useState(0);
+  const [last12Sum, setLast12Sum] = React.useState(0);
+
+  // Zero payment (before child birth) if not employed
+  const EmploymentLimit = employment > 2
+    ? 0
+    : 1;
+  const mzp = 490000
+
+  // maximum payment limited by mzp
+  const last12SumP = last12Sum / 12
+  const last24SumP = last12Sum / 24
+
+  const Income12Limit = checked
+    ? last12SumP > mzp
+      ? mzp
+      : last12SumP
+    : l12mIncome > mzp
+      ? mzp
+      : l12mIncome;
+
+  const Income24Limit = checked
+    ? last24SumP > mzp
+      ? mzp
+      : last24SumP
+    : l24mIncome > mzp
+      ? mzp
+      : l24mIncome;
+
+  // Payment before child birth
+  const PaymentBeforeChildBirth = condition / 30 * Income12Limit * 0.9 * EmploymentLimit
+
+  // Child birth payment calculation
+  const mrp = 3450 // in 2023
+  const ChildBirthPayment = child > 3
+    ? mrp * 68
+    : mrp * 38;
+
+  // Payment after child birth
+  let PaymentAfterChildBirth;
+
+  PaymentAfterChildBirth =
+    employment === 3 && child === 1
+      ? 5.76 * mrp
+      : employment === 3 && child === 2
+        ? 6.81 * mrp
+        : employment === 3 && child === 3
+          ? 7.85 * mrp
+          : employment === 3 && child === 4
+            ? 8.90 * mrp
+            : employment === 1 || (employment === 2 && child === 1)
+              ? Math.max(0.4 * Income24Limit * 0.9, 5.76 * mrp)
+              : employment === 1 || (employment === 2 && child === 2)
+                ? Math.max(0.4 * Income24Limit * 0.9, 6.81 * mrp)
+                : employment === 1 || (employment === 2 && child === 3)
+                  ? Math.max(0.4 * Income24Limit * 0.9, 7.85 * mrp)
+                  : Math.max(0.4 * Income24Limit * 0.9, 8.90 * mrp);
+
+  // Toolkits text
+  const aboutIncome = "Доход, с которого исчисляется социальные отчисления (СО). Если Вы наемный работник, то это сумма Вашего начисленного оклада минус 10% обязательных пенсионных отчислений (ОПВ)"
+
 
   return (
 
@@ -93,7 +170,8 @@ export default function Calculation() {
         />
       </LocalizationProvider>
       <StyledFormHelperText>
-        Вот тут нужно написать на что это влияет тро-ло-ло
+        Планируемая дата оформления болничного листа для выхода в отпуск по беременности и родам (декретного отпуска).
+        Данное поле влияет на период, учитываемый при детализированном расчете среднемесячного дохода за последние 12 и 24 месяца.
       </StyledFormHelperText>
 
       <StyledSubheader>
@@ -185,43 +263,83 @@ export default function Calculation() {
         />}
         label="Детализированный расчет"
       />
+      {checked ? (
+        <div>
+          <StyledTooltip title={aboutIncome}>
+            <StyledSubheader>
+              <PaymentsTwoTone />
+              Среднемесячный доход за последние 24 месяца:
+            </StyledSubheader>
+          </StyledTooltip>
+          {months.map((month, index) => (
+            <grid item key={month}>
+              <StyledTextFieldForDetailedCalc
+                label={month}
+                variant="outlined"
+                type="number"
+                //helperText="Some important text"
+                onBlur={(event) => {
+                  const value = Number(event.target.value);
+                  const newLast24Sum = last24Sum + value;
+                  setLast24Sum(newLast24Sum);
 
-
-      <StyledSubheader>
-        <PaymentsTwoTone />
-        Среднемесячный доход за последние 12 месяцев:
-      </StyledSubheader>
-      <StyledTextField
-        id="standard-basic1"
-        label="Среднемесячный доход за последние 12 месяцев"
-        variant="outlined"
-        type="number"
-        onChange={handleChangel12mIncome}
-        value={l12mIncome}
-      />
-      <StyledFormHelperText>
-        Вот тут нужно написать на что это влияет тро-ло-ло
-      </StyledFormHelperText>
-
-      <StyledSubheader>
-        <PaymentsTwoTone />
-        Среднемесячный доход за последние 24 месяца:
-      </StyledSubheader>
-      <StyledTextField
-        id="standard-basic2"
-        label="Среднемесячный доход за последние 24 месяца"
-        variant="outlined"
-        type="number"
-        onChange={handleChangel24mIncome}
-        value={l24mIncome}
-      />
-      <StyledFormHelperText>
-        Вот тут нужно написать на что это влияет тро-ло-ло
-      </StyledFormHelperText>
-
+                  if (index < months.length - 12) {
+                    const newLast12Sum = last12Sum + value;
+                    setLast12Sum(newLast12Sum);
+                  }
+                }}
+              />
+            </grid>
+          ))}
+          <StyledSubheader>
+            <LocalAtmTwoTone />Среднемесячный доход за последние 12 месяцев: {parseInt(last12SumP).toLocaleString('en')} тенге
+          </StyledSubheader>
+          <StyledSubheader>
+            <LocalAtmTwoTone />Среднемесячный доход за последние 24 месяцев: {parseInt(last24SumP).toLocaleString('en')} тенге
+          </StyledSubheader>
+        </div>
+      ) : (
+        <div>
+          <StyledTooltip title={aboutIncome}>
+            <StyledSubheader>
+              <PaymentsTwoTone />
+              Среднемесячный доход за последние 12 месяцев:
+            </StyledSubheader>
+          </StyledTooltip>
+          <StyledTextField
+            id="standard-basic1"
+            label="Среднемесячный доход за последние 12 месяцев"
+            variant="outlined"
+            type="number"
+            onChange={handleChangel12mIncome}
+            value={l12mIncome}
+          />
+          <StyledFormHelperText>
+            Размер среднемесячного дохода за последние 12 месяцев влияет на Единовременную социальную выплату
+            на случаи потери дохода в связи с беременностью и родами, усыновлением (удочерением) новорожденного ребенка (детей).
+          </StyledFormHelperText>
+          <StyledTooltip title={aboutIncome}>
+            <StyledSubheader>
+              <PaymentsTwoTone />
+              Среднемесячный доход за последние 24 месяца:
+            </StyledSubheader>
+          </StyledTooltip>
+          <StyledTextField
+            id="standard-basic2"
+            label="Среднемесячный доход за последние 24 месяца"
+            variant="outlined"
+            type="number"
+            onChange={handleChangel24mIncome}
+            value={l24mIncome}
+          />
+          <StyledFormHelperText>
+            Размер среднемесячного дохода за последние 24 месяца влияет на Ежемесячную социальную выплату
+            на случай потери дохода в связи с уходом за ребенком по достижении им возраста 1,5 лет.
+          </StyledFormHelperText>
+        </div>
+      )}
+      <Results ChildBirthPayment={ChildBirthPayment} PaymentBeforeChildBirth={PaymentBeforeChildBirth} PaymentAfterChildBirth={PaymentAfterChildBirth} />
     </StyledContainer>
-
-
 
   )
 }

@@ -1,16 +1,17 @@
-import './App.css';
+import './App.css'
+import React from 'react';
+
 import Header from './Components/Header/Header';
-import Mainpage from './Components/Mainpage/Mainpage';
 import Calculation from './Components/Calculation/Calculation';
-import Results from './Components/Results/Results';
 
 function App() {
+
+  const [child, setChild] = React.useState('1');
+
   return (
     <div className="App">
-     <Header/>
-     {/* <Mainpage/> */}
-     <Calculation/>
-     <Results/>
+      <Header />
+      <Calculation child={child} setChild={setChild} />
     </div>
   );
 }

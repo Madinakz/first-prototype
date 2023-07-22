@@ -1,5 +1,6 @@
 import React from 'react';
 
+
 // Styled Material UI elements
 import {
     StyledContainer,
@@ -17,35 +18,41 @@ import {
     FavoriteTwoTone
 } from '@mui/icons-material';
 
-const aboutMe = "Привет! Меня зовут Мадина, и я джуниор фронтэнд разработчик из Яблочного города. Я являюсь выпускницей школы nFactorial по гранту от проекта TechOrda. Моя жажда знаний и увлечение технологиями привели меня к смене карьеры от бухгалтеора в веб-разработке."
+// Toolkits text
+const aboutMe = "Привет! Меня зовут Мадина, и я junior front-end разработчик из Яблочного города. Я являюсь выпускницей школы nFactorial по гранту от проекта TechOrda. Моя жажда новых знаний привела меня к смене карьеры от бухгалтера в веб-разработке."
 
-export default function Results() {
-    return (
-        <StyledContainer maxWidth="lg">
+
+
+    const Results = ({ ChildBirthPayment, PaymentBeforeChildBirth, PaymentAfterChildBirth }) => {
+        const PaymentAfterChildBirthFull = PaymentAfterChildBirth * 18
+      
+        return (
+
+          <StyledContainer maxWidth="lg">
             <StyledResults>
-                Результаты расчета:
+              Результаты расчета:
             </StyledResults>
             <StyledSubheader>
-                <Face3TwoTone />
-                Социальная выплата по беременности и родам в связи с потерей дохода (единовременно до родов):
+              <Face3TwoTone />
+              Социальная выплата по беременности и родам в связи с потерей дохода (единовременно до родов): {parseInt(PaymentBeforeChildBirth).toLocaleString('en')} тенге
             </StyledSubheader>
             <StyledSubheader>
-                <ChildCareTwoTone />
-                Государственное пособие в связи с рождением ребенка (единовременно после родов):
+              <ChildCareTwoTone />
+              Государственное пособие в связи с рождением ребенка (единовременно после родов): {parseInt(ChildBirthPayment).toLocaleString('en')} тенге
             </StyledSubheader>
             <StyledSubheader>
-                <ChildFriendlyTwoTone />
-                Социальная выплата по уходу за ребенком по достижении им 1,5 лет (ежемесячно после родов):
+              <ChildFriendlyTwoTone />
+              Социальная выплата по уходу за ребенком по достижении им 1,5 лет: {parseInt(PaymentAfterChildBirthFull).toLocaleString('en')} тенге (или ежемесячно {parseInt(PaymentAfterChildBirth).toLocaleString('en')} тенге после родов)
             </StyledSubheader>
             <footer>
-                <StyledTooltip title={aboutMe}>
-                    <StyledFooter>
-                        Coded with <FavoriteTwoTone /> by Madina
-                    </StyledFooter>
-                </StyledTooltip>
+              <StyledTooltip title={aboutMe}>
+                <StyledFooter>
+                  Coded with <FavoriteTwoTone /> by Madina
+                </StyledFooter>
+              </StyledTooltip>
             </footer>
-        </StyledContainer>
-
-    )
-}
-
+          </StyledContainer>
+        );
+      };
+      
+      export default Results;
